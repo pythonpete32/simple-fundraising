@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
+    "@aragon/apps-token-manager": "^2.1.0",
     "@aragon/client": "^1.1.0",
-    "@aragon/os": "^4.0.1"
+    "@aragon/os": "^4.0.1",
+    "go-ipfs": "^0.4.18-hacky2",
+    "openzeppelin-solidity": "^1.12.0"
   },
   "devDependencies": {
     "@aragon/cli": "^6.0.0",

@@ -1,7 +1,8 @@
-# Aragon Simple Fundraisng
+# Aragon Simple Fundraising
+
 Allows a DAO to accept ETH, mints and sends tokens to the contributor at a fixed rate.
 
-## What's in the box?
+## What's in the box
 
 ### npm Scripts
 
@@ -15,5 +16,5 @@ Allows a DAO to accept ETH, mints and sends tokens to the contributor at a fixed
 
 - [**@aragon/os**](https://github.com/aragon/aragonOS): Aragon interfaces
 - [**@aragon/client**](https://github.com/aragon/aragon.js/tree/master/packages/aragon-client): Wrapper for Aragon application RPC
-- [**@aragon/apps-vault**]()
-- [**openzeppelin-solidity@1.12.0**]()
+- [**@aragon/apps-token-manager**](https://www.npmjs.com/package/@aragon/apps-token-manager)
+- [**openzeppelin-solidity@1.12.0**](https://www.npmjs.com/package/openzeppelin-solidity)
