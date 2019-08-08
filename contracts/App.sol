@@ -148,7 +148,7 @@ contract App is AragonApp {
         address _beneficiary,
         uint256 _weiAmount
     )
-    internal isInitialized {
+    internal isInitialized { 
         // optional override
     }
 

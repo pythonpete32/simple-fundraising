@@ -27,14 +27,17 @@ const settingsForNetwork = (network) => {
   try {
     return require(configFilePath(`${network}_key.json`))
   } catch (e) {
-    return { }
+    return {}
   }
 }
 
 // Lazily loaded provider
 const providerForNetwork = (network) => (
   () => {
-    let { rpc, keys } = settingsForNetwork(network)
+    let {
+      rpc,
+      keys
+    } = settingsForNetwork(network)
     rpc = rpc || defaultRPC(network)
 
     if (!keys || keys.length == 0) {
@@ -58,6 +61,18 @@ module.exports = {
     rinkeby: {
       network_id: 4,
       provider: providerForNetwork('rinkeby')
+    }
+  },
+  compilers: {
+    solc: {
+      version: "0.4.24", // Fetch exact version from solc-bin (default: truffle's version)
+      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
+      settings: { // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: true,
+          runs: 200
+        }
+      }
     }
   }
 }
