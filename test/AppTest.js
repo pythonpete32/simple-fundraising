@@ -4,7 +4,9 @@ const EVMScriptRegistryFactory = artifacts.require('EVMScriptRegistryFactory')
 const ACL = artifacts.require('ACL')
 const Kernel = artifacts.require('Kernel')
 
-const deployedContract = require("./helpers")
+const {
+    deployedContract
+} = require("./utils")
 
 contract("App", ([rootAccount, ...accounts]) => {
 
