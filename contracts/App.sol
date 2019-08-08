@@ -59,13 +59,13 @@ contract App is AragonApp {
         wallet = _wallet;
         token = _token;
         tokenManager = _tokenManager;
-    }, "MintedCrowdsale: minting failed");
+    }
 
     /**
      * @dev sets a new deposit address
      * @param _wallet the new wallet address
      */
-    function setWallet(address _wallet) external auth(SET_WALLET_ADDRESS) {
+    function setWallet(address _wallet) external isInitialized auth(SET_WALLET_ADDRESS) {
         wallet = _wallet;
     }
 
@@ -73,7 +73,7 @@ contract App is AragonApp {
      * @dev sets a new Rate
      * @param _rate the new rate
      */
-    function setRate(uint _rate) external auth(SET_RATE) {
+    function setRate(uint _rate) external isInitialized auth(SET_RATE) {
         rate = _rate;
     }
 
@@ -85,7 +85,7 @@ contract App is AragonApp {
     /**
      * @dev fallback function ***DO NOT OVERRIDE***
      */
-    function () external payable {
+    function () external isInitialized payable {
         buyTokens(msg.sender);
     }
 
@@ -93,7 +93,7 @@ contract App is AragonApp {
      * @dev low level token purchase ***DO NOT OVERRIDE***
      * @param _beneficiary Address performing the token purchase
      */
-    function buyTokens(address _beneficiary) public payable {
+    function buyTokens(address _beneficiary) public isInitialized payable {
 
         uint256 weiAmount = msg.value;
         _preValidatePurchase(_beneficiary, weiAmount);
@@ -134,7 +134,7 @@ contract App is AragonApp {
         address _beneficiary,
         uint256 _weiAmount
     )
-    internal {
+    internal isInitialized {
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
     }
@@ -148,7 +148,7 @@ contract App is AragonApp {
         address _beneficiary,
         uint256 _weiAmount
     )
-    internal {
+    internal isInitialized {
         // optional override
     }
 
@@ -157,7 +157,7 @@ contract App is AragonApp {
      * @param beneficiary Token purchaser
      * @param tokenAmount Number of tokens to be minted
      */
-    function _deliverTokens(address beneficiary, uint256 tokenAmount) internal {
+    function _deliverTokens(address beneficiary, uint256 tokenAmount) internal isInitialized {
         tokenManager.mint(beneficiary, tokenAmount);
     }
 
@@ -170,7 +170,7 @@ contract App is AragonApp {
         address _beneficiary,
         uint256 _tokenAmount
     )
-    internal {
+    internal isInitialized {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
 
@@ -183,7 +183,7 @@ contract App is AragonApp {
         address _beneficiary,
         uint256 _weiAmount
     )
-    internal {
+    internal isInitialized {
         // optional override
     }
 
@@ -193,14 +193,14 @@ contract App is AragonApp {
      * @return Number of tokens that can be purchased with the specified _weiAmount
      */
     function _getTokenAmount(uint256 _weiAmount)
-    internal view returns(uint256) {
+    internal view isInitialized returns(uint256) {
         return _weiAmount.mul(rate);
     }
 
     /**
      * @dev Determines how ETH is stored/forwarded on purchases.
      */
-    function _forwardFunds() internal {
+    function _forwardFunds() internal isInitialized {
         wallet.transfer(msg.value);
     }
 }
