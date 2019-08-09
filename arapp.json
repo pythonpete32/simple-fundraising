@@ -1,8 +1,12 @@
 {
-  "roles": [
+  "roles": [{
+      "name": "SET_WALLET_ADDRESS_ROLE",
+      "id": "SET_WALLET_ADDRESS_ROLE",
+      "params": []
+    },
     {
-      "name": "Dummy role",
-      "id": "DUMMY_ROLE",
+      "name": "SET_RATE_ROLE",
+      "id": "SET_RATE_ROLE",
       "params": []
     }
   ],

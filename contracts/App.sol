@@ -9,8 +9,8 @@ contract App is AragonApp {
     using SafeMath for uint256;
     using SafeERC20 for MiniMeToken;
 
-    bytes32 public SET_WALLET_ADDRESS = keccak256("SET_WALLET_ADDRESS");
-    bytes32 public SET_RATE = keccak256("SET_RATE");
+    bytes32 public SET_WALLET_ADDRESS_ROLE = keccak256("SET_WALLET_ADDRESS_ROLE");
+    bytes32 public SET_RATE_ROLE = keccak256("SET_RATE_ROLE");
 
 
 
@@ -65,7 +65,7 @@ contract App is AragonApp {
      * @dev sets a new deposit address
      * @param _wallet the new wallet address
      */
-    function setWallet(address _wallet) external isInitialized auth(SET_WALLET_ADDRESS) {
+    function setWallet(address _wallet) external isInitialized auth(SET_WALLET_ADDRESS_ROLE) {
         wallet = _wallet;
     }
 
@@ -73,7 +73,7 @@ contract App is AragonApp {
      * @dev sets a new Rate
      * @param _rate the new rate
      */
-    function setRate(uint _rate) external isInitialized auth(SET_RATE) {
+    function setRate(uint _rate) external isInitialized auth(SET_RATE_ROLE) {
         rate = _rate;
     }
 
