@@ -29,14 +29,14 @@ contract("App", ([rootAccount, ...accounts]) => {
 
     beforeEach(async () => {
 
-        const newKernelReceipt = await this.daoFactory.newDAO(this.rootAddress)
+        const newKernelReceipt = await this.daoFactory.newDAO(this.rootAddress) // <-- this launches a dew dao and saves the tx in newKernelReceipt ? what is the root address? is it the first address the web3 object returns?
         kernel = await Kernel.at(newKernelReceipt.logs.filter(log => log.event === 'DeployDAO')[0].args.dao) // kernel == DAO instance
-        acl = await ACL.at(await this.kernel.acl())
+        acl = await ACL.at(await this.kernel.acl()) // <-- gets reference to the DAO acl ?
 
         const APP_MANAGER_ROLE = await kernelBase.APP_MANAGER_ROLE()
         await acl.createPermission(rootAddress, kernel.address, APP_MANAGER_ROLE, rootAddress, {
             from: rootAddress
-        })
+        }) // <- changes the app manager role to root address and sends the tx from the root address?
 
         const newAppReceipt = await kernel.newAppInstance('0x1234', appBase.address)
         app = await App.at(deployedContract(newAppReceipt))
@@ -52,7 +52,7 @@ contract("App", ([rootAccount, ...accounts]) => {
         token.changeController(tokenManager);
 
         // initialize apps 
-        app.initialize(1, this.rootAddress, tokenManager, token) // <-- root address is message.sender?
+        app.initialize(1, this.rootAddress, tokenManager, token)
         tokenManager.initialize(token, true, 0);
 
         // permissions
@@ -63,6 +63,10 @@ contract("App", ([rootAccount, ...accounts]) => {
 
         acl.createPermission(ANY_ENTITY, app, tokenManager.SET_WALLET_ADDRESS_ROLE(), this.rootAddress);
         acl.createPermission(ANY_ENTITY, app, tokenManager.SET_RATE_ROLE(), this.rootAddress);
+    })
+
+    describe('some test', () => {
+
     })
 
 
