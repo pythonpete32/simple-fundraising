@@ -1,73 +1,157 @@
-const App = artifacts.require("App")
-const DAOFactory = artifacts.require('DAOFactory')
-const EVMScriptRegistryFactory = artifacts.require('EVMScriptRegistryFactory')
-const ACL = artifacts.require('ACL')
-const Kernel = artifacts.require('Kernel')
-const TokenManager = artifacts.require('TokenManager')
-const MiniMeTokenFactory = artifacts.require('MiniMeTokenFactory')
+const App = artifacts.require("App");
+const DAOFactory = artifacts.require("DAOFactory");
+const EVMScriptRegistryFactory = artifacts.require("EVMScriptRegistryFactory");
+const ACL = artifacts.require("ACL");
+const Kernel = artifacts.require("Kernel");
+const TokenManager = artifacts.require("TokenManager");
+const MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
 
-const {
-    deployedContract
-} = require("./utils")
+const { deployedContract } = require("./utils");
 
 contract("App", ([rootAccount, ...accounts]) => {
+  let kernelBase, aclBase, evmScriptRegistryFactory, daoFactory;
+  let appBase, tokenManagerBase;
+  let tokenManager, MiniMeTokenFactory, token, app;
 
-    let kernelBase, aclBase, evmScriptRegistryFactory, daoFactory
-    let appBase, tokenManagerBase
-    let TokenManager, MiniMeTokenFactory, token, app
+  // before we create the app bases for the proxies to point
+  before(async () => {
+    kernelBase = await Kernel.new(true);
+    aclBase = await ACL.new();
+    evmScriptRegistryFactory = await EVMScriptRegistryFactory.new();
+    daoFactory = await DAOFactory.new(
+      kernelBase.address,
+      aclBase.address,
+      evmScriptRegistryFactory.address
+    );
 
-    // before we create the app bases for the proxies to point
-    before(async () => {
-        kernelBase = await Kernel.new(true)
-        aclBase = await ACL.new()
-        evmScriptRegistryFactory = await EVMScriptRegistryFactory.new()
-        daoFactory = await DAOFactory.new(this.kernelBase.address, this.aclBase.address, this.evmScriptRegistryFactory.address)
+    tokenManagerBase = await TokenManager.new();
+    appBase = await App.new();
+  });
 
-        tokenManagerBase = await TokenManager.new()
-        appBase = await App.new()
-    })
+  beforeEach(async () => {
+    const newKernelReceipt = await daoFactory.newDAO(rootAccount); // <-- this launches a dew dao and saves the tx in newKernelReceipt ? what is the root address? is it the first address the web3 object returns?
+    kernel = await Kernel.at(
+      newKernelReceipt.logs.filter(log => log.event === "DeployDAO")[0].args.dao
+    ); // kernel == DAO instance
+    acl = await ACL.at(await kernel.acl()); // <-- gets reference to the DAO acl ?
 
-    beforeEach(async () => {
+    const APP_MANAGER_ROLE = await kernelBase.APP_MANAGER_ROLE();
+    await acl.createPermission(
+      rootAccount,
+      kernel.address,
+      APP_MANAGER_ROLE,
+      rootAccount,
+      {
+        from: rootAccount
+      }
+    ); // <- changes the app manager role to root address and sends the tx from the root address?
 
-        const newKernelReceipt = await this.daoFactory.newDAO(this.rootAddress) // <-- this launches a dew dao and saves the tx in newKernelReceipt ? what is the root address? is it the first address the web3 object returns?
-        kernel = await Kernel.at(newKernelReceipt.logs.filter(log => log.event === 'DeployDAO')[0].args.dao) // kernel == DAO instance
-        acl = await ACL.at(await this.kernel.acl()) // <-- gets reference to the DAO acl ?
+    const newAppReceipt = await kernel.newAppInstance(
+      "0x1234",
+      appBase.address
+    );
+    app = await App.at(deployedContract(newAppReceipt));
 
-        const APP_MANAGER_ROLE = await kernelBase.APP_MANAGER_ROLE()
-        await acl.createPermission(rootAddress, kernel.address, APP_MANAGER_ROLE, rootAddress, {
-            from: rootAddress
-        }) // <- changes the app manager role to root address and sends the tx from the root address?
+    // setup token
+    // tokenFactory = await MiniMeTokenFactory.new();
+    // token = await tokenFactory.createCloneToken(
+    //   MiniMeToken(0),
+    //   0,
+    //   "Testing Token",
+    //   18,
+    //   "TST",
+    //   true
+    // );
+    // await token.generateTokens(address(rootAccount), 100); // give root 100 tokens
 
-        const newAppReceipt = await kernel.newAppInstance('0x1234', appBase.address)
-        app = await App.at(deployedContract(newAppReceipt))
+    // setup TokenManager
+    // const newTokenManagerReceipt = await kernel.newAppInstance(
+    //   "0x4567",
+    //   tokenManagerBase.address
+    // );
+    // tokenManager = await TokenManager.at(
+    //   deployedContract(newTokenManagerReceipt)
+    // );
 
-        // setup token
-        tokenFactory = new MiniMeTokenFactory();
-        token = tokenFactory.createCloneToken(MiniMeToken(0), 0, "Testing Token", 18, "TST", true)
-        token.generateTokens(address(root), 100); // give root 100 tokens
+    // await token.changeController(tokenManager);
 
-        // setup TokenManager
-        tokenManagerID = apmNamehash("token-manager")
-        tokenManager = TokenManager(kernel.newAppInstance(tokenManagerID, tokenManagerBase)) // <-- is this correct
-        token.changeController(tokenManager);
+    // initialize apps
+    // await app.initialize(1, rootAccount, tokenManager, accounts[0]);
+    // await tokenManager.initialize(token, true, 0);
 
-        // initialize apps 
-        app.initialize(1, this.rootAddress, tokenManager, token)
-        tokenManager.initialize(token, true, 0);
+    // permissions
+    // await acl.createPermission(
+    //   ANY_ENTITY,
+    //   tokenManager,
+    //   tokenManager.MINT_ROLE(),
+    //   app
+    // );
+    // await acl.createPermission(
+    //   ANY_ENTITY,
+    //   tokenManager,
+    //   tokenManager.ISSUE_ROLE(),
+    //   rootAccount
+    // );
+    // await acl.createPermission(
+    //   ANY_ENTITY,
+    //   tokenManager,
+    //   tokenManager.ASSIGN_ROLE(),
+    //   rootAccount
+    // );
+    // await acl.createPermission(
+    //   ANY_ENTITY,
+    //   tokenManager,
+    //   tokenManager.REVOKE_VESTINGS_ROLE(),
+    //   rootAccount
+    // );
 
-        // permissions
-        acl.createPermission(ANY_ENTITY, tokenManager, tokenManager.MINT_ROLE(), app);
-        acl.createPermission(ANY_ENTITY, tokenManager, tokenManager.ISSUE_ROLE(), this.rootAddress);
-        acl.createPermission(ANY_ENTITY, tokenManager, tokenManager.ASSIGN_ROLE(), this.rootAddress);
-        acl.createPermission(ANY_ENTITY, tokenManager, tokenManager.REVOKE_VESTINGS_ROLE(), this.rootAddress);
+    // await acl.createPermission(
+    //   ANY_ENTITY,
+    //   app,
+    //   tokenManager.SET_WALLET_ADDRESS_ROLE(),
+    //   rootAccount
+    // );
+    // await acl.createPermission(
+    //   ANY_ENTITY,
+    //   app,
+    //   tokenManager.SET_RATE_ROLE(),
+    //   rootAccount
+    // );
+  });
 
-        acl.createPermission(ANY_ENTITY, app, tokenManager.SET_WALLET_ADDRESS_ROLE(), this.rootAddress);
-        acl.createPermission(ANY_ENTITY, app, tokenManager.SET_RATE_ROLE(), this.rootAddress);
-    })
+  //---------------- tests --------------------//
 
-    describe('some test', () => {
+  describe("initialize(uint256 _rate, address _wallet, TokenManager _tokenManager, MiniMeToken _token)", () => {
+    it("should set variables as expected", async () => {
+      // Arrange
+      const expectedRate = 5;
+      const expectedWallet = accounts[0];
+      const expectedTokenManager = accounts[1];
+      const expectedToken = accounts[2];
 
-    })
+      // Act
+      await app.initialize(
+        expectedRate,
+        expectedWallet,
+        expectedTokenManager,
+        expectedToken
+      );
 
+      // Assert
+      actualRate = await app.rate();
+      actualWallet = await app.wallet();
+      actualTokenManager = await app.tokenManager();
+      actualToken = await app.token();
 
-})
+      assert.equal(actualRate, expectedRate);
+      assert.equal(actualWallet, expectedWallet);
+      assert.equal(actualTokenManager, expectedTokenManager);
+      assert.equal(actualToken, expectedToken);
+    });
+  });
+
+  describe("buyTokens()", () => {
+    // <-- buy tokens with what account
+    it("should send tokens to the msg.sender", async () => {});
+  });
+});

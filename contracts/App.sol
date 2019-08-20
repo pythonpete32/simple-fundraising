@@ -18,7 +18,7 @@ contract App is AragonApp {
     address public wallet;
     uint256 public rate;
     uint256 public weiRaised;
-    TokenManager tokenManager;
+    TokenManager public tokenManager;
 
 
     /**
