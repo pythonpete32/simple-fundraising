@@ -5,13 +5,14 @@ const ACL = artifacts.require("ACL");
 const Kernel = artifacts.require("Kernel");
 const TokenManager = artifacts.require("TokenManager");
 const MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
+const MiniMeToken = artifacts.require("MiniMeToken");
 
 const { deployedContract } = require("./utils");
 
 contract("App", ([rootAccount, ...accounts]) => {
   let kernelBase, aclBase, evmScriptRegistryFactory, daoFactory;
   let appBase, tokenManagerBase;
-  let tokenManager, MiniMeTokenFactory, token, app;
+  let tokenManager, miniMeTokenFactory, token, app;
 
   // before we create the app bases for the proxies to point
   before(async () => {
@@ -53,16 +54,23 @@ contract("App", ([rootAccount, ...accounts]) => {
     app = await App.at(deployedContract(newAppReceipt));
 
     // setup token
-    // tokenFactory = await MiniMeTokenFactory.new();
-    // token = await tokenFactory.createCloneToken(
-    //   MiniMeToken(0),
-    //   0,
-    //   "Testing Token",
-    //   18,
-    //   "TST",
-    //   true
-    // );
-    // await token.generateTokens(address(rootAccount), 100); // give root 100 tokens
+    tokenFactory = await MiniMeTokenFactory.new();
+
+    // new token == zero address
+    tokenReceipt = await tokenFactory.createCloneToken(
+      "0x0000000000000000000000000000000000000000",
+      0,
+      "Testing Token",
+      18,
+      "TST",
+      true
+    );
+
+    token = await MiniMeToken.at(deployedContract(tokenReceipt));
+
+    //---
+    // await token.generateTokens(rootAccount, 100); // give root 100 tokens
+    //---
 
     // setup TokenManager
     // const newTokenManagerReceipt = await kernel.newAppInstance(
