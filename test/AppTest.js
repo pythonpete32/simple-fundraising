@@ -11,8 +11,7 @@ const { deployedContract } = require("./utils");
 
 contract("App", ([rootAccount, ...accounts]) => {
   let kernelBase, aclBase, evmScriptRegistryFactory, daoFactory;
-  let appBase, tokenManagerBase;
-  let tokenManager, miniMeTokenFactory, token, app;
+  let appBase, app;
 
   // before we create the app bases for the proxies to point
   before(async () => {
@@ -55,8 +54,6 @@ contract("App", ([rootAccount, ...accounts]) => {
 
     // setup token
     tokenFactory = await MiniMeTokenFactory.new();
-
-    // new token == zero address
     tokenReceipt = await tokenFactory.createCloneToken(
       "0x0000000000000000000000000000000000000000",
       0,
@@ -66,7 +63,8 @@ contract("App", ([rootAccount, ...accounts]) => {
       true
     );
 
-    token = await MiniMeToken.at(deployedContract(tokenReceipt));
+    // pull out the relevent vars into a js file and try to compile it on its own. better yet try it in the truffle development console
+    const token = await MiniMeToken.at(deployedContract(tokenReceipt));
 
     //---
     // await token.generateTokens(rootAccount, 100); // give root 100 tokens
@@ -159,7 +157,6 @@ contract("App", ([rootAccount, ...accounts]) => {
   });
 
   describe("buyTokens()", () => {
-    // <-- buy tokens with what account
     it("should send tokens to the msg.sender", async () => {});
   });
 });
