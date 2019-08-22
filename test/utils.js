@@ -5,6 +5,8 @@ const getLog = (receipt, logName, argName) => {
 
 const deployedContract = receipt => getLog(receipt, "NewAppProxy", "proxy");
 
+const deployedToken = receipt => console.log(receipt.to);
+
 module.exports = {
   getLog,
   deployedContract
