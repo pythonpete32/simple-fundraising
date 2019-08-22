@@ -7,7 +7,7 @@ const TokenManager = artifacts.require("TokenManager");
 const MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
 const MiniMeToken = artifacts.require("MiniMeToken");
 
-const { deployedContract } = require("./utils");
+const { deployedContract, deployedToken } = require("./utils");
 
 contract("App", ([rootAccount, ...accounts]) => {
   let kernelBase, aclBase, evmScriptRegistryFactory, daoFactory;
