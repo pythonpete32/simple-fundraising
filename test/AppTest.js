@@ -63,9 +63,11 @@ contract("App", ([rootAccount, ...accounts]) => {
       true
     );
 
-    // pull out the relevent vars into a js file and try to compile it on its own. better yet try it in the truffle development console
-    const token = await MiniMeToken.at(deployedContract(tokenReceipt));
-
+    //  test to see if receipt.to returns the contract address
+    const token = await deployedToken(tokenReceipt);
+    console.log("‐----------------");
+    console.log(token);
+    console.log("‐----------------");
     //---
     // await token.generateTokens(rootAccount, 100); // give root 100 tokens
     //---
