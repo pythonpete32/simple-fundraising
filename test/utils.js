@@ -9,5 +9,6 @@ const deployedToken = receipt => console.log(receipt.to);
 
 module.exports = {
   getLog,
-  deployedContract
+  deployedContract,
+  deployedToken
 };
